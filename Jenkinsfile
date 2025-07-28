@@ -2,51 +2,43 @@ pipeline {
     agent {label 'verisoft-2'}
 
     parameters {
-        string(name: 'REPO_URL', defaultValue: 'https://github.com/Ruth1067/FinalPipeline.git', description: 'Repository URL')
-        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Branch name')
+        string(name: 'REPO_URL', defaultValue: 'https://github.com/ShacharRacheli/JenkinsProject', description: 'Repository URL')
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Branch name to build')
     }
 
     environment {
-        MAIN_BRANCH = 'main'  // משתנה סביבה שמייצג את הבראנצ' המרכזי
+        MAIN_BRANCH = 'main'
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Clone code') {
             steps {
                 script {
-                    echo "Starting code checkout..."
-
-                    // אם הבראנצ' מהפרמטרים תואם את ברירת המחדל – נשתמש ב-checkout scm
                     if (params.BRANCH_NAME == env.MAIN_BRANCH) {
                         checkout scm
                     } else {
-                        // אחרת – נוריד ידנית לפי ה-URL והבראנצ'
                         git branch: "${params.BRANCH_NAME}", url: "${params.REPO_URL}"
                     }
-
-                    echo "Code checkout completed"
                 }
             }
         }
 
-        stage('Compile') {
-            options {
-                timeout(time: 5, unit: 'MINUTES')
-            }
+        stage('Compilation') {
             steps {
                 echo 'Starting compilation stage'
-                sh 'mvn compile'
+                timeout(time: 5, unit: 'MINUTES') {
+                    sh returnStatus:true,script:'mvn compile'
+                }
                 echo 'Compilation stage completed successfully'
             }
         }
 
         stage('Run Tests') {
-            options {
-                timeout(time: 5, unit: 'MINUTES')
-            }
             steps {
                 echo 'Starting test stage'
-                sh 'mvn test'
+                timeout(time: 5, unit: 'MINUTES') {
+                    sh returnStatus:true,script:'mvn test'
+                }
                 echo 'Test stage completed successfully'
             }
         }
@@ -54,14 +46,15 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Pipeline failed'
+            echo 'Pipeline failed.'
         }
     }
 
-    triggers {
-        cron('30 5 * * 1\n0 14 * * *')
-    }
+ triggers {
+     cron('30 5 * * 1\n0 14 * * *')
+ }
+
 }
