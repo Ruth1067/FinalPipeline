@@ -11,10 +11,7 @@ pipeline {
     }
 
     triggers {
-        // יום שני בשעה 05:30
-        cron('TZ=Asia/Jerusalem\n30 5 * * 1')
-        // יום רביעי בשעה 14:00
-        cron('TZ=Asia/Jerusalem\n0 14 * * *')
+        cron('TZ=Asia/Jerusalem 30 5 * * 1\nTZ=Asia/Jerusalem 0 14 * * 3')
     }
 
     stages {
