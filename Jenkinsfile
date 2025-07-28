@@ -11,8 +11,9 @@ pipeline {
     }
 
     triggers {
-        cron('TZ=Asia/Jerusalem 30 5 * * 1\nTZ=Asia/Jerusalem 0 14 * * 3')
+        cron('30 5 * * 1\n0 14 * * *')
     }
+
 
     stages {
         stage('Clone Repository') {
