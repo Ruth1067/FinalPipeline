@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent {label 'verisoft-2'}
 
     parameters {
         string(name: 'REPO_URL', defaultValue: 'https://github.com/Ruth1067/FinalPipeline.git', description: 'Repository URL')
@@ -10,11 +10,6 @@ pipeline {
         MAIN_BRANCH = 'main'  // משתנה סביבה שמייצג את הבראנצ' המרכזי
     }
 
-    triggers {
-        cron('30 5 * * 1\n0 14 * * *')
-    }
-
-
     stages {
         stage('Clone Repository') {
             steps {
@@ -22,11 +17,11 @@ pipeline {
                     echo "Starting code checkout..."
 
                     // אם הבראנצ' מהפרמטרים תואם את ברירת המחדל – נשתמש ב-checkout scm
-                    if (env.BRANCH_NAME == env.MAIN_BRANCH) {
+                    if (params.BRANCH_NAME == env.MAIN_BRANCH) {
                         checkout scm
                     } else {
                         // אחרת – נוריד ידנית לפי ה-URL והבראנצ'
-                        git branch: params.BRANCH_NAME, url: params.REPO_URL
+                        git branch: "${params.BRANCH_NAME}", url: "${params.REPO_URL}"
                     }
 
                     echo "Code checkout completed"
@@ -64,5 +59,9 @@ pipeline {
         failure {
             echo 'Pipeline failed'
         }
+    }
+
+    triggers {
+        cron('30 5 * * 1\n0 14 * * *')
     }
 }
