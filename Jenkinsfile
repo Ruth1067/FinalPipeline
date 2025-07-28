@@ -2,8 +2,8 @@ pipeline {
     agent {label 'verisoft-2'}
 
     parameters {
-        string(name: 'REPO_URL', defaultValue: 'https://github.com/Ruth1067/FinalPipeline', description: 'Repository URL')
-        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Branch name to build')
+        string(name: 'REPO_URL', defaultValue: 'https://github.com/Ruth1067/FinalPipeline.git', description: 'Repository URL')
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Branch name')
     }
 
     environment {
@@ -11,22 +11,26 @@ pipeline {
     }
 
     stages {
-        stage('Clone code') {
+        stage('Clone Repository') {
             steps {
                 script {
+                    echo "Starting code checkout..."
+
                     if (params.BRANCH_NAME == env.MAIN_BRANCH) {
                         checkout scm
                     } else {
                         git branch: "${params.BRANCH_NAME}", url: "${params.REPO_URL}"
                     }
+
+                    echo "Code checkout completed"
                 }
             }
         }
 
-        stage('Compilation') {
+        stage('Compile') {
             steps {
                 echo 'Starting compilation stage'
-                timeout(time: 5, unit: 'MINUTES') {
+                timeout(time: 5, unit: 'MINUTES'){
                     sh returnStatus:true,script:'mvn compile'
                 }
                 echo 'Compilation stage completed successfully'
@@ -36,7 +40,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo 'Starting test stage'
-                timeout(time: 5, unit: 'MINUTES') {
+                timeout(time: 5, unit: 'MINUTES'){
                     sh returnStatus:true,script:'mvn test'
                 }
                 echo 'Test stage completed successfully'
@@ -46,15 +50,15 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Pipeline completed successfully'
         }
         failure {
-            echo 'Pipeline failed.'
+            echo 'Pipeline failed'
         }
     }
 
- triggers {
-     cron('30 5 * * 1\n0 14 * * *')
- }
-
+    triggers {
+        cron('30 5 * * 1\n0 14 * * *')
+    }
 }
+
